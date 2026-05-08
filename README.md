@@ -2,7 +2,7 @@
 
 A wearable AI pendant with a living face. Built on ESP32-S3 with a 1.32" AMOLED display.
 
-> **Status:** in early development. Hardware on the way, firmware skeleton being set up.
+> **Status:** firmware skeleton complete. Eyes animation module written and compiling. Hardware on the way.
 
 ## What is this
 
