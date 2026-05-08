@@ -124,6 +124,24 @@ Waveshare поставляет с платой:
 
 ---
 
+## TODO при получении платы — миграция платформы
+
+Перед тем как включить display модуль, нужно:
+
+1. **Освободить ~4 ГБ на диске** (текущий диск на 80 ГБ почти полон)
+2. **Удалить старые пакеты:** `rm -rf ~/.platformio/packages/ ~/.platformio/platforms/`
+3. **Переключить platformio.ini:**
+   ```ini
+   platform = https://github.com/pioarduino/platform-espressif32/releases/download/55.03.38-1/platform-espressif32.zip
+   ```
+4. **Раскомментировать lib_deps** в platformio.ini (GFX + LVGL)
+5. **Убрать build_src_filter** (или изменить на `+<*>`)
+6. **Раскомментировать `#include "display/Display.h"`** в main.cpp
+
+После этого `pio run` скачает arduino-esp32 3.3.8 (IDF 5.5.4) и GFX Library 1.6.5 скомпилируется.
+
+---
+
 ## Решение по стеку для StarBoy
 
 **Принято:** Arduino_GFX + LVGL 8.3.11 для UI-слоя.
