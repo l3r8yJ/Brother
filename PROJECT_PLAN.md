@@ -12,20 +12,20 @@
 - [x] Установить PlatformIO IDE Extension
 - [x] Добавить пользователя в группы `dialout`, `plugdev`
 - [x] Установить udev-правила PlatformIO
-- [ ] Создать структуру папок проекта `~/code/starboy/`
-- [ ] Создать PlatformIO-проект `starboy-firmware` (board: esp32-s3-devkitc-1, framework: arduino)
-- [ ] Адаптировать `platformio.ini` под нашу плату:
+- [x] Создать структуру папок проекта `~/code/LILBRO/`
+- [x] Создать PlatformIO-проект `starboy-firmware` (board: esp32-s3-devkitc-1, framework: arduino)
+- [x] Адаптировать `platformio.ini` под нашу плату:
   - PSRAM: OPI 8MB
   - Flash: 8MB
   - CPU: 240MHz
   - Partition scheme: с большим APP-разделом для будущих библиотек
   - Monitor speed: 115200
   - Build flags: для PSRAM, USB CDC и т.д.
-- [ ] Настроить `.gitignore` (исключить `.pio/`, `.vscode/` кроме настроек проекта, `secrets.h`)
-- [ ] `git init`, первый коммит «initial PlatformIO project»
-- [ ] Создать `secrets.example.h` с шаблоном (Wi-Fi SSID/PASS, API keys placeholders)
-- [ ] Сделать тестовый `main.cpp` с `Serial.println("StarBoy boot")`
-- [ ] Проверить компиляцию: `pio run` должен пройти без ошибок (прошивать пока некуда)
+- [x] Настроить `.gitignore` (исключить `.pio/`, `.vscode/` кроме настроек проекта, `secrets.h`)
+- [x] `git init`, первый коммит «initial PlatformIO project»
+- [x] Создать `secrets.example.h` с шаблоном (Wi-Fi SSID/PASS, API keys placeholders)
+- [x] Сделать тестовый `main.cpp` с `Serial.println("StarBoy boot")`
+- [x] Проверить компиляцию: `pio run` должен пройти без ошибок (прошивать пока некуда)
 
 **Definition of Done:** `pio run` выдаёт `[SUCCESS]`, проект закоммичен в git, структура папок соответствует CLAUDE.md.
 
