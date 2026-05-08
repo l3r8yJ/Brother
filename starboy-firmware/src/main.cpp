@@ -2,6 +2,8 @@
 #include "display/Display.h"
 #include "eyes/Eyes.h"
 
+// Baseline binary size (2026-05-08): Flash 13.2%, RAM 7.4%
+
 static void eyesTask(void*) {
     const TickType_t period = pdMS_TO_TICKS(33); // ~30fps
     TickType_t last = xTaskGetTickCount();
