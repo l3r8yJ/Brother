@@ -1,9 +1,6 @@
 #include <Arduino.h>
 
-// Display module requires arduino-esp32 3.x + pioarduino platform.
-// Enable after platform migration when board arrives.
-// See docs/display-driver-research.md for migration plan.
-// #include "display/Display.h"
+#include "display/Display.h"
 
 void setup() {
     Serial.begin(115200);
@@ -16,8 +13,17 @@ void setup() {
     Serial.printf("PSRAM: %lu KB\n", ESP.getPsramSize() / 1024);
     Serial.printf("Heap:  %lu KB free\n", ESP.getFreeHeap() / 1024);
 
+    if (!Display::instance().begin()) {
+        Serial.println("FATAL: display init failed");
+        while (true) delay(1000);
+    }
+
+    Display::instance().fillScreen(0xF800); delay(400);
+    Display::instance().fillScreen(0x07E0); delay(400);
+    Display::instance().fillScreen(0x001F); delay(400);
+    Display::instance().fillScreen(0x0000);
+
     Serial.println("Boot OK");
-    Serial.println("NOTE: display init deferred — needs arduino-esp32 3.x");
 }
 
 void loop() {
