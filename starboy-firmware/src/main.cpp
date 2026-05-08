@@ -1,6 +1,15 @@
 #include <Arduino.h>
-
 #include "display/Display.h"
+#include "eyes/Eyes.h"
+
+static void eyesTask(void*) {
+    const TickType_t period = pdMS_TO_TICKS(33); // ~30fps
+    TickType_t last = xTaskGetTickCount();
+    for (;;) {
+        Eyes::instance().update();
+        vTaskDelayUntil(&last, period);
+    }
+}
 
 void setup() {
     Serial.begin(115200);
@@ -18,10 +27,16 @@ void setup() {
         while (true) delay(1000);
     }
 
+    // Color flash self-test
     Display::instance().fillScreen(0xF800); delay(400);
     Display::instance().fillScreen(0x07E0); delay(400);
     Display::instance().fillScreen(0x001F); delay(400);
     Display::instance().fillScreen(0x0000);
+
+    Eyes::instance().begin();
+    Eyes::instance().setEmotion(Emotion::IDLE);
+
+    xTaskCreatePinnedToCore(eyesTask, "eyes", 4096, nullptr, 5, nullptr, 1);
 
     Serial.println("Boot OK");
 }
