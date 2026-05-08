@@ -1,0 +1,14 @@
+# PlatformIO
+starboy-firmware/.pio/
+starboy-firmware/.pioenvs/
+
+# VS Code (keep project settings, ignore user-local)
+.vscode/
+!.vscode/extensions.json
+
+# Secrets
+**/secrets.h
+
+# OS
+.DS_Store
+Thumbs.db
