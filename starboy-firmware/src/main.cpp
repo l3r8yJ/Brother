@@ -4,11 +4,14 @@
 
 // Baseline binary size (2026-05-08): Flash 13.2%, RAM 7.4%
 
+static volatile uint32_t s_frame_count = 0;
+
 static void eyesTask(void*) {
     const TickType_t period = pdMS_TO_TICKS(33); // ~30fps
     TickType_t last = xTaskGetTickCount();
     for (;;) {
         Eyes::instance().update();
+        s_frame_count++;
         vTaskDelayUntil(&last, period);
     }
 }
@@ -44,6 +47,11 @@ void setup() {
 }
 
 void loop() {
-    delay(5000);
-    Serial.println("StarBoy alive");
+    delay(1000);
+    uint32_t fps = s_frame_count;
+    s_frame_count = 0;
+    Serial.printf("[perf] fps=%lu  heap=%lu KB  minHeap=%lu KB\n",
+                  fps,
+                  ESP.getFreeHeap() / 1024,
+                  ESP.getMinFreeHeap() / 1024);
 }
