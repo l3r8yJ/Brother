@@ -36,7 +36,6 @@ void Menu::onShortPress() {
         return;
     }
 
-    // EDITING
     Item item = static_cast<Item>(_focus);
     if (item == Item::BRIGHTNESS) {
         _brightness += 25;
@@ -95,7 +94,6 @@ void Menu::buildScreen() {
     lv_obj_set_style_bg_opa(_screen, LV_OPA_COVER, 0);
     lv_obj_set_size(_screen, 466, 466);
 
-    // Ring labels — positioned on circle of radius 160px
     for (int i = 0; i < ITEM_COUNT; i++) {
         _ring_labels[i] = lv_label_create(_screen);
         lv_label_set_text(_ring_labels[i], kNames[i]);
@@ -104,21 +102,18 @@ void Menu::buildScreen() {
         lv_obj_align(_ring_labels[i], LV_ALIGN_CENTER, kRingDx[i], kRingDy[i]);
     }
 
-    // Center: selected item name
     _center_name = lv_label_create(_screen);
     lv_obj_set_style_text_font(_center_name, &lv_font_montserrat_24, 0);
     lv_obj_set_style_text_color(_center_name, lv_color_hex(0xFFAA00), 0);
     lv_obj_set_style_text_align(_center_name, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_align(_center_name, LV_ALIGN_CENTER, 0, -20);
 
-    // Center: current value or status
     _center_value = lv_label_create(_screen);
     lv_obj_set_style_text_font(_center_value, &lv_font_montserrat_20, 0);
     lv_obj_set_style_text_color(_center_value, lv_color_white(), 0);
     lv_obj_set_style_text_align(_center_value, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_align(_center_value, LV_ALIGN_CENTER, 0, +20);
 
-    // Arc for brightness/volume editing
     _arc = lv_arc_create(_screen);
     lv_obj_set_size(_arc, 140, 140);
     lv_obj_align(_arc, LV_ALIGN_CENTER, 0, 0);
@@ -131,7 +126,6 @@ void Menu::buildScreen() {
     lv_obj_align(_arc_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_add_flag(_arc_label, LV_OBJ_FLAG_HIDDEN);
 
-    // Info multiline label
     _info_label = lv_label_create(_screen);
     lv_obj_set_style_text_font(_info_label, &lv_font_montserrat_14, 0);
     lv_obj_set_style_text_color(_info_label, lv_color_hex(0xAAAAAA), 0);
@@ -140,12 +134,11 @@ void Menu::buildScreen() {
     lv_label_set_text(_info_label, "");
     lv_obj_add_flag(_info_label, LV_OBJ_FLAG_HIDDEN);
 
-    // Hint at bottom
     _hint_label = lv_label_create(_screen);
     lv_obj_set_style_text_font(_hint_label, &lv_font_montserrat_14, 0);
     lv_obj_set_style_text_color(_hint_label, lv_color_hex(0x555555), 0);
     lv_obj_align(_hint_label, LV_ALIGN_BOTTOM_MID, 0, -20);
-    lv_label_set_text(_hint_label, "SHORT=вперёд  LONG=выбор");
+    lv_label_set_text(_hint_label, "SHORT=next  LONG=select");
 
     lv_scr_load(_screen);
     updateUI();
@@ -164,11 +157,9 @@ void Menu::destroyScreen() {
     for (int i = 0; i < ITEM_COUNT; i++) _ring_labels[i] = nullptr;
     _open = false;
     Eyes::instance().setRendering(true);
-    Eyes::instance().showEyesScreen();
 }
 
 void Menu::updateUI() {
-    // Ring labels: highlight selected
     for (int i = 0; i < ITEM_COUNT; i++) {
         if (!_ring_labels[i]) continue;
         bool sel = (i == _focus);
@@ -182,10 +173,8 @@ void Menu::updateUI() {
     Item item    = static_cast<Item>(_focus);
     bool editing = (_state == State::EDITING);
 
-    // Center name
     if (_center_name) lv_label_set_text(_center_name, kNames[_focus]);
 
-    // Arc for brightness/volume in edit mode
     bool showArc = editing && (item == Item::BRIGHTNESS || item == Item::VOLUME);
     if (showArc) {
         lv_obj_clear_flag(_arc, LV_OBJ_FLAG_HIDDEN);
@@ -201,7 +190,6 @@ void Menu::updateUI() {
         lv_obj_add_flag(_arc_label, LV_OBJ_FLAG_HIDDEN);
     }
 
-    // Center value
     if (_center_value && !showArc) {
         if (item == Item::BRIGHTNESS) {
             char buf[8]; snprintf(buf, sizeof(buf), "%d%%", _brightness);
@@ -210,13 +198,12 @@ void Menu::updateUI() {
             char buf[8]; snprintf(buf, sizeof(buf), "%d%%", _volume);
             lv_label_set_text(_center_value, buf);
         } else if (_confirmPending) {
-            lv_label_set_text(_center_value, "Подтвердить?");
+            lv_label_set_text(_center_value, "Confirm?");
         } else {
             lv_label_set_text(_center_value, "");
         }
     }
 
-    // Info label
     if (editing && item == Item::INFO) {
         updateInfoText();
         lv_obj_clear_flag(_info_label, LV_OBJ_FLAG_HIDDEN);
@@ -225,14 +212,13 @@ void Menu::updateUI() {
         lv_obj_add_flag(_info_label, LV_OBJ_FLAG_HIDDEN);
     }
 
-    // Hint
     if (_hint_label) {
         if (_confirmPending) {
-            lv_label_set_text(_hint_label, "SHORT=да  LONG=отмена");
+            lv_label_set_text(_hint_label, "SHORT=yes  LONG=cancel");
         } else if (editing) {
-            lv_label_set_text(_hint_label, "SHORT=менять  LONG=назад");
+            lv_label_set_text(_hint_label, "SHORT=change  LONG=back");
         } else {
-            lv_label_set_text(_hint_label, "SHORT=вперёд  LONG=выбор");
+            lv_label_set_text(_hint_label, "SHORT=next  LONG=select");
         }
     }
 }
@@ -241,7 +227,7 @@ void Menu::updateInfoText() {
     if (!_info_label) return;
     char buf[128];
     snprintf(buf, sizeof(buf),
-        "CPU: %lu MHz\nHeap: %lu KB\nPSRAM: %lu KB\nUptime: %lus",
+        "CPU: %lu MHz\nHeap: %lu KB\nPSRAM: %lu KB\nUp: %lus",
         getCpuFrequencyMhz(),
         ESP.getFreeHeap() / 1024,
         ESP.getPsramSize() / 1024,

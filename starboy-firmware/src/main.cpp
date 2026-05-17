@@ -44,6 +44,16 @@ static constexpr int kNumEmotions = sizeof(kEmotions) / sizeof(kEmotions[0]);
 static int s_emotionIdx = 0;
 
 // ============================================================================
+// Eyes task — Core 0
+// ============================================================================
+static void eyesTask(void*) {
+    for (;;) {
+        if (!g_menuActive) Eyes::instance().update();
+        vTaskDelay(pdMS_TO_TICKS(5));
+    }
+}
+
+// ============================================================================
 // Button helpers
 // ============================================================================
 static void handleBoot(uint32_t now) {
@@ -93,14 +103,10 @@ static void handlePwr(uint32_t now) {
         if (g_menuActive) {
             Menu::instance().onLongPress();
             g_menuActive = Menu::instance().isOpen();
-            if (!g_menuActive) {
-                Eyes::instance().setRendering(true);
-                Eyes::instance().showEyesScreen();
-            }
+            if (!g_menuActive) Eyes::instance().setRendering(true);
         }
     } else if (dur <= SHORT_PRESS_MAX) {
         if (!g_menuActive) {
-            // Open menu
             Eyes::instance().setRendering(false);
             g_menuActive = true;
             Menu::instance().open();
@@ -109,13 +115,11 @@ static void handlePwr(uint32_t now) {
             if (!Menu::instance().isOpen()) {
                 g_menuActive = false;
                 Eyes::instance().setRendering(true);
-                Eyes::instance().showEyesScreen();
             }
         }
     }
 }
 
-// Detect long press while button is still held (for PWR)
 static void pollPwrLong(uint32_t now) {
     if (s_pwrStable == LOW && !s_pwrLongFired) {
         if (now - s_pwrPressStart >= LONG_PRESS_MS) {
@@ -123,10 +127,7 @@ static void pollPwrLong(uint32_t now) {
             if (g_menuActive) {
                 Menu::instance().onLongPress();
                 g_menuActive = Menu::instance().isOpen();
-                if (!g_menuActive) {
-                    Eyes::instance().setRendering(true);
-                    Eyes::instance().showEyesScreen();
-                }
+                if (!g_menuActive) Eyes::instance().setRendering(true);
             }
         }
     }
@@ -169,6 +170,8 @@ void setup() {
     Touch::instance().begin();
     Menu::instance().begin();
 
+    xTaskCreatePinnedToCore(eyesTask, "eyes", 8192, nullptr, 5, nullptr, 0);
+
     Serial.println("Boot OK");
     Serial.println("BOOT=cycle emotion | PWR=menu");
 }
@@ -187,8 +190,10 @@ void loop() {
         Touch::instance().update();
     }
 
-    lv_tick_inc(5);
-    lv_task_handler();
+    if (g_menuActive) {
+        lv_tick_inc(5);
+        lv_task_handler();
+    }
 
     // Telemetry every second
     static uint32_t s_lastLog = 0;

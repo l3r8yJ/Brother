@@ -24,7 +24,7 @@ private:
     static constexpr int16_t kRingDx[5] = {   0, 152,  94, -94, -152 };
     static constexpr int16_t kRingDy[5] = {-160, -49, 129, 129,  -49 };
     static constexpr const char* kNames[5] = {
-        "Яркость", "Громкость", "Инфо", "Перезагр.", "Выкл."
+        "Bright", "Volume", "Info", "Reboot", "Power"
     };
 
     void buildScreen();
